@@ -1,0 +1,2 @@
+#/account//store-id/space-id/
+#/myaccount/*/myspace
