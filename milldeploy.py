@@ -870,17 +870,17 @@ def create_bit_report_worker_config(jar_version, time,
         ],
         Period=300,
         Unit='Seconds',
-        Threshold=10,
-        EvaluationPeriods=2,
+        Threshold=1,
+        EvaluationPeriods=1,
         ComparisonOperator='GreaterThanOrEqualToThreshold'
     )
 
     scale_down_alarm = dict(
-        AlarmName='empty-bit-report-queue',
+        AlarmName='bit-report-queue-empty',
         AlarmDescription='empty bit report queue',
         ActionsEnabled=True,
         AlarmActions=[],
-        MetricName='ApproximateNumberOfMessagesNotVisible',
+        MetricName='ApproximateNumberOfMessagesVisible',
         Namespace='AWS/SQS',
         Statistic='Average',
         Dimensions=[
@@ -889,11 +889,11 @@ def create_bit_report_worker_config(jar_version, time,
                 'Value': QueueNames().format(env_prefix, QueueNames.BIT_REPORT)
             },
         ],
-        Period=900,
+        Period=3600,
         Unit='Seconds',
-        Threshold=10,
-        EvaluationPeriods=4,
-        ComparisonOperator='LessThanThreshold'
+        Threshold=0,
+        EvaluationPeriods=6,
+        ComparisonOperator='LessThanOrEqualToThreshold'
     )
 
     return AutoScaleGroupConfig(asg,
