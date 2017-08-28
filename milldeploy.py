@@ -452,14 +452,14 @@ def create_audit_worker_config(jar_version, time,
     asg = dict(
          AutoScalingGroupName=scaling_group_name,
          LaunchConfigurationName=get_name(launch_config),
-         MinSize=0,
+         MinSize=1,
          MaxSize=10,
          AvailabilityZones=AvailabilityZones.ALL,
          VPCZoneIdentifier=subnet_id)
     scale_up_policy =  dict(AutoScalingGroupName=scaling_group_name,
         PolicyName='Scale Up',
         PolicyType='SimpleScaling',
-        Cooldown=300,
+        Cooldown=900,
         ScalingAdjustment=1,
         AdjustmentType='ChangeInCapacity')
     scale_down_policy =  dict(AutoScalingGroupName=scaling_group_name,
