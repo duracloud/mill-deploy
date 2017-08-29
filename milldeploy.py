@@ -61,7 +61,7 @@ def cli(aws_profile, config_dir):
     repo = Repo.clone_from("https://github.com/duracloud/mill-init.git",
                          "mill-init")
 
-    repo.git.checkout('release-2.0.0')
+    repo.git.checkout('release-2.1.0')
 
 
     # generate cloud init scripts
