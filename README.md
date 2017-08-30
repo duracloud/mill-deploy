@@ -18,8 +18,32 @@ pip install virtualenv
 virtualenv -p python3 venv 
 # Launch virtual environment in shell
 source venv/bin/activate
+# Install the application
+python setup.py install
 # Set up your configuration files
-TBD
+Copy the sample configuration files in the ./sample-config directory to another directory 
+and enter your environment specific properties.
+# Preliminary setup in AWS: 
+In addition to setting up an IAM Role with sufficient permissions (TBD), you'll need to setup a VPC and subnets, VPC Security Group, and EFS file system.
+
+VPC notes:  it must be called "duracloud" and there must be an associated subnet in availability zones us-east-1a, us-east-1b, us-east-1c, us-east-1d, and us-east-1e.
+
+VPC Security Group must be named: mill-vpc
+
+More details on the environment setup coming soon.
+
+# Setup your aws profile
+You'll need to setup two files:
+~/.aws/config :
+[profile my-aws-profile]
+output = text
+region = us-east-1
+
+~/.aws/credentials :
+[my-aws-profile]
+aws_access_key_id = <aws-key-id> 
+aws_secret_access_key = <aws-secret-key>
+
 # Run the tool
-milldeploy --help
+milldeploy --config_dir /path/to/your/config/dir --aws_profile my-aws-profile
 
