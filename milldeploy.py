@@ -87,8 +87,10 @@ def cli(aws_profile, config_dir):
                                     config_dir)
     jar_version = props["jarVersion"]
     key_name = props["keyName"]
+
     image_id = 'ami-841f46ff'
 
+    sns_client = session.client('sns')
     ec2_client = session.client('ec2')
 
     subnet_ids = get_subnets(ec2_client)
@@ -195,6 +197,8 @@ def cli(aws_profile, config_dir):
                            i.scale_up_policy,
                            i.scale_up_alarm)
 
+        setup_autoscale_notifications(sns_client, autoscale_client,asg["AutoScalingGroupName"])
+
 def get_security_group_id(ec2_client):
     response = ec2_client.describe_security_groups(
         Filters=[
@@ -239,6 +243,22 @@ def get_subnets(ec2_client):
     click.echo("retrieved subnet ids: %s" % subnet_ids)
     return ",".join(subnet_ids)
 
+def setup_autoscale_notifications(sns_client, autoscale_client,
+                                  autoscale_group_name):
+    topic_arn = sns_client.create_topic(Name='mill-notification')['TopicArn']
+    response = autoscale_client.put_notification_configuration(
+    AutoScalingGroupName=autoscale_group_name,
+    TopicARN=topic_arn,
+    NotificationTypes=[
+        'autoscaling:EC2_INSTANCE_LAUNCH',
+        'autoscaling:EC2_INSTANCE_TERMINATE',
+        'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
+        'autoscaling:EC2_INSTANCE_TERMINATE_ERROR',
+    ])
+    check_response(response)
+    click.echo("configured notifications on topic %s for %s" % (topic_arn,
+                                                   autoscale_group_name))
+
 
 def read_properties_files_into_dict(path):
     myprops = {}
@@ -253,6 +273,7 @@ def read_properties_files_into_dict(path):
 
 def read_file_as_string(path):
     return open(path, 'r').read()
+
 
 def autoscale_exists(client, asg):
     click.echo("auto scaling groups: ")
