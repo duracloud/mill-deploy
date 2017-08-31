@@ -831,7 +831,7 @@ def create_bit_report_worker_config(jar_version, time,
         InstanceType="m4.large",
         SpotPrice="0.0325",
         UserData=read_file_as_string(
-            'output/cloud-init-bit-worker.txt'),
+            'output/cloud-init-bit-report-worker.txt'),
         BlockDeviceMappings=[
             {
                 'DeviceName': '/dev/sda1',
