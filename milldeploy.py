@@ -61,7 +61,7 @@ def cli(aws_profile, config_dir):
     repo = Repo.clone_from("https://github.com/duracloud/mill-init.git",
                          "mill-init")
 
-    repo.git.checkout('release-2.1.0')
+    repo.git.checkout('release-2.1.1')
 
 
     # generate cloud init scripts
@@ -415,7 +415,7 @@ def create_storage_stats_worker_config(jar_version, time,
         ],
         Period=60,
         Threshold=0,
-        EvaluationPeriods=5,
+        EvaluationPeriods=30,
         ComparisonOperator='GreaterThanThreshold'
     )
 
