@@ -20,9 +20,6 @@ virtualenv -p python3 venv
 source venv/bin/activate
 # Install the application
 python setup.py install
-# Set up your configuration files
-Copy the sample configuration files in the ./sample-config directory to another directory 
-and enter your environment specific properties.
 # Preliminary setup in AWS: 
 In addition to setting up an IAM Role with sufficient permissions (TBD), you'll need to setup a VPC and subnets, VPC Security Group, and EFS file system.
 
@@ -31,6 +28,10 @@ VPC notes:  it must be called "duracloud" and there must be an associated subnet
 VPC Security Group must be named: mill-vpc
 
 More details on the environment setup coming soon.
+
+# Set up your configuration files
+Copy the sample configuration files in the ./sample-config directory to another directory 
+and enter your environment specific properties.
 
 # Setup your aws profile
 You'll need to setup two files:
