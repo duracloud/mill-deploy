@@ -924,7 +924,7 @@ def create_dup_producer_config(jar_version, time,
         InstanceType="m4.large",
         SpotPrice="0.0325",
         UserData=read_file_as_string(
-            'output/cloud-init-bit-report-worker.txt')
+            'output/cloud-init-dup-producer.txt')
     )
 
     launch_config.update(base_launch_config)
