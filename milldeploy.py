@@ -61,7 +61,7 @@ def cli(aws_profile, config_dir):
     repo = Repo.clone_from("https://github.com/duracloud/mill-init.git",
                          "mill-init")
 
-    repo.git.checkout('release-2.1.1')
+    repo.git.checkout('release-2.1.2')
 
 
     # generate cloud init scripts
@@ -921,8 +921,7 @@ def create_dup_producer_config(jar_version, time,
         LaunchConfigurationName=("dup producer %s %s" % (
             jar_version,
                                                             time)),
-        InstanceType="m4.large",
-        SpotPrice="0.0325",
+        InstanceType="t2.micro",
         UserData=read_file_as_string(
             'output/cloud-init-dup-producer.txt')
     )
@@ -935,7 +934,6 @@ def create_dup_producer_config(jar_version, time,
          LaunchConfigurationName=get_name(launch_config),
          MinSize=0,
          MaxSize=1,
-         AvailabilityZones=AvailabilityZones.ALL,
          VPCZoneIdentifier=subnet_ids)
     scale_up_policy =  None
     scale_up_alarm = None
