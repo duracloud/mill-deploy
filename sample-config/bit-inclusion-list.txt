@@ -1,0 +1,18 @@
+####################################################
+# Bit inclusion list
+####################################################
+# This allows you to include accounts,storage providers
+# and spaces from a bit integrity run based on the 
+# following format:
+# /<subdomain | *>/<storeId | *>/<spaceId | *>
+# For example the following formulation would 
+# match any space in the "test" account across 
+# providers with the name "test-space"
+# /test/*/test-space
+#
+# Please note that by default  all accounts, providers,
+# and spaces are included.  Any formulations entered
+# in this file will automatically exclude everything 
+# that is not included here.  Any exclusions defined in the
+# exclusions file will be applied to the set of included
+# spaces.

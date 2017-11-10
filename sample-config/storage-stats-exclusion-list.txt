@@ -1,2 +1,15 @@
-#/account//store-id/space-id/
-#/myaccount/*/myspace
+####################################################
+# storage stats exclusion list
+####################################################
+# This allows you to exclude accounts,storage providers
+# and spaces from a storage stats gathering  run based on the 
+# following format:
+# /<subdomain | *>/<storeId | *>/<spaceId | *>
+# For example the following formulation would 
+# match any space in the "test" account across 
+# providers with the name "test-space"
+# /test/*/test-space
+#
+# Please note the exclusions are matched on the 
+# set of spaces defined in the inclusions file.
+# By default no spacs are excluded.

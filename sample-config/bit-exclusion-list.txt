@@ -1,1 +1,17 @@
+####################################################
+# Bit exclusion list
+####################################################
+# This allows you to exclude accounts,storage providers
+# and spaces from a bit integrity run based on the 
+# following format:
+# /<subdomain | *>/<storeId | *>/<spaceId | *>
+# For example the following formulation would 
+# match any space in the "test" account across 
+# providers with the name "test-space"
+# /test/*/test-space
+#
+# Please note the exclusions are matched on the 
+# set of spaces defined in the inclusions file.
+# By default we exclude x-duracloud-admin on all 
+# accounts
 /*/*/x-duracloud-admin
