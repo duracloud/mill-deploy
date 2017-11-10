@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='milldeploy',
-    version='0.3.0',
+    version='0.4.0-snapshot',
     py_modules=['milldeploy'],
     install_requires=[
         'Click',
