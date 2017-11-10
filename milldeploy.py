@@ -6,10 +6,6 @@ import shutil
 import datetime
 
 
-class AvailabilityZones:
-    ALL = ["us-east-1a", "us-east-1b", "us-east-1c","us-east-1d",
-           "us-east-1e"]
-
 class QueueNames():
     STORAGE_STATS = "storage-stats"
     AUDIT = "audit"
@@ -61,7 +57,7 @@ def cli(aws_profile, config_dir):
     repo = Repo.clone_from("https://github.com/duracloud/mill-init.git",
                          "mill-init")
 
-    repo.git.checkout('release-2.1.2')
+    repo.git.checkout('release-2.1.3')
 
 
     # generate cloud init scripts
@@ -88,12 +84,16 @@ def cli(aws_profile, config_dir):
     jar_version = props["jarVersion"]
     key_name = props["keyName"]
 
-    image_id = 'ami-841f46ff'
+    #latest trusty
+    # ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727 
+    image_id = 'ami-3408c34c'
 
     sns_client = session.client('sns')
     ec2_client = session.client('ec2')
 
-    subnet_ids = get_subnets(ec2_client)
+    subnet_ids = get_subnet_ids_as_string(ec2_client)
+    availability_zones = get_subnet_availability_zones(ec2_client);
+
     security_group = get_security_group_id(ec2_client)
 
     env_prefix = props["instancePrefix"]
@@ -121,47 +121,55 @@ def cli(aws_profile, config_dir):
     groups.append(create_sentinel_config(jar_version,
                                                      time,
                                                      subnet_ids,
+                                                     availability_zones,
                                                      base_launch_config))
 
     groups.append(create_storage_stats_worker_config(jar_version,
                                                      time,
                                                      subnet_ids,
+                                                     availability_zones,
                                                      env_prefix,
                                                      base_launch_config))
 
     groups.append(create_audit_worker_config(jar_version,
                                                      time,
                                                      subnet_ids,
+                                                     availability_zones,
                                                      env_prefix,
                                                      base_launch_config))
 
     groups.append(create_low_priority_dup_worker_config(jar_version,
                                                      time,
                                                      subnet_ids,
+                                                     availability_zones,
                                                      env_prefix,
                                                      base_launch_config))
 
     groups.append(create_high_priority_dup_worker_config(jar_version,
                                                      time,
                                                      subnet_ids,
+                                                     availability_zones,
                                                      env_prefix,
                                                      base_launch_config))
 
     groups.append(create_bit_worker_config(jar_version,
                                                      time,
                                                      subnet_ids,
+                                                     availability_zones,
                                                      env_prefix,
                                                      base_launch_config))
 
     groups.append(create_bit_report_worker_config(jar_version,
                                                      time,
                                                      subnet_ids,
+                                                     availability_zones,
                                                      env_prefix,
                                                      base_launch_config))
 
     groups.append(create_dup_producer_config(jar_version,
                                                      time,
                                                      subnet_ids,
+                                                     availability_zones,
                                                      env_prefix,
                                                      base_launch_config))
 
@@ -236,7 +244,28 @@ def get_subnets(ec2_client):
     response = ec2_client.describe_subnets()
     check_response(response)
     subnets = response["Subnets"]
+
+    vpc_subnets = []
+    for subnet in subnets:
+        if subnet["VpcId"] == vpcId:
+            vpc_subnets.append(subnet)
+
+    return subnets
+
+def get_subnet_availability_zones(ec2_client):
+    av_zones = []
+    subnets = get_subnets(ec2_client)
+    for subnet in subnets:
+        av_zone = subnet["AvailabilityZone"]
+        if av_zones not in av_zones:
+            av_zones.append(av_zone)
+
+    return av_zones
+
+def get_subnet_ids_as_string(ec2_client):
     subnet_ids = []
+    subnets = get_subnets(ec2_client)
+
     for subnet in subnets:
         subnet_ids.append(subnet["SubnetId"])
 
@@ -367,6 +396,7 @@ def put_scaling_policy(auto_scaling_client,
 
 def create_storage_stats_worker_config(jar_version, time,
                                        subnet_id,
+                                       availability_zones,
                                        env_prefix, base_launch_config):
         # storage stats worker config
     launch_config = dict(
@@ -383,7 +413,7 @@ def create_storage_stats_worker_config(jar_version, time,
          LaunchConfigurationName=get_name(launch_config),
          MinSize=0,
          MaxSize=1,
-         AvailabilityZones=AvailabilityZones.ALL,
+         AvailabilityZones=availability_zones,
          VPCZoneIdentifier=subnet_id)
 
     scale_up_policy =  dict(AutoScalingGroupName=scaling_group_name,
@@ -448,6 +478,7 @@ def create_storage_stats_worker_config(jar_version, time,
 
 def create_audit_worker_config(jar_version, time,
                                        subnet_id,
+                                       availability_zones,
                                        env_prefix, base_launch_config):
         # storage stats worker config
     launch_config = dict(
@@ -473,7 +504,7 @@ def create_audit_worker_config(jar_version, time,
          LaunchConfigurationName=get_name(launch_config),
          MinSize=1,
          MaxSize=10,
-         AvailabilityZones=AvailabilityZones.ALL,
+         AvailabilityZones=availability_zones,
          VPCZoneIdentifier=subnet_id)
     scale_up_policy =  dict(AutoScalingGroupName=scaling_group_name,
         PolicyName='Scale Up',
@@ -539,6 +570,7 @@ def create_audit_worker_config(jar_version, time,
 
 def create_high_priority_dup_worker_config(jar_version, time,
                                        subnet_ids,
+                                       availability_zones,
                                        env_prefix, base_launch_config):
         # storage stats worker config
     launch_config = dict(
@@ -568,7 +600,7 @@ def create_high_priority_dup_worker_config(jar_version, time,
          LaunchConfigurationName=get_name(launch_config),
          MinSize=0,
          MaxSize=10,
-         AvailabilityZones=AvailabilityZones.ALL,
+         AvailabilityZones=availability_zones,
          VPCZoneIdentifier=subnet_ids)
     scale_up_policy =  dict(AutoScalingGroupName=scaling_group_name,
         PolicyName='Scale Up',
@@ -634,6 +666,7 @@ def create_high_priority_dup_worker_config(jar_version, time,
 
 def create_low_priority_dup_worker_config(jar_version, time,
                                        subnet_ids,
+                                       availability_zones,
                                        env_prefix, base_launch_config):
         # storage stats worker config
     launch_config = dict(
@@ -663,7 +696,7 @@ def create_low_priority_dup_worker_config(jar_version, time,
          LaunchConfigurationName=get_name(launch_config),
          MinSize=0,
          MaxSize=10,
-         AvailabilityZones=AvailabilityZones.ALL,
+         AvailabilityZones=availability_zones,
          VPCZoneIdentifier=subnet_ids)
     scale_up_policy =  dict(AutoScalingGroupName=scaling_group_name,
         PolicyName='Scale Up',
@@ -728,6 +761,7 @@ def create_low_priority_dup_worker_config(jar_version, time,
 
 def create_bit_worker_config(jar_version, time,
                                        subnet_ids,
+                                       availability_zones,
                                        env_prefix, base_launch_config):
         # storage stats worker config
     launch_config = dict(
@@ -757,7 +791,7 @@ def create_bit_worker_config(jar_version, time,
          LaunchConfigurationName=get_name(launch_config),
          MinSize=0,
          MaxSize=10,
-         AvailabilityZones=AvailabilityZones.ALL,
+         AvailabilityZones=availability_zones,
          VPCZoneIdentifier=subnet_ids)
     scale_up_policy =  dict(AutoScalingGroupName=scaling_group_name,
         PolicyName='Scale Up',
@@ -822,6 +856,7 @@ def create_bit_worker_config(jar_version, time,
 
 def create_bit_report_worker_config(jar_version, time,
                                        subnet_ids,
+                                       availability_zones,
                                        env_prefix, base_launch_config):
         # storage stats worker config
     launch_config = dict(
@@ -851,7 +886,7 @@ def create_bit_report_worker_config(jar_version, time,
          LaunchConfigurationName=get_name(launch_config),
          MinSize=0,
          MaxSize=1,
-         AvailabilityZones=AvailabilityZones.ALL,
+         AvailabilityZones=availability_zones,
          VPCZoneIdentifier=subnet_ids)
     scale_up_policy =  dict(AutoScalingGroupName=scaling_group_name,
         PolicyName='Scale Up',
@@ -915,6 +950,7 @@ def create_bit_report_worker_config(jar_version, time,
 
 def create_dup_producer_config(jar_version, time,
                                        subnet_ids,
+                                       availability_zones,
                                        env_prefix, base_launch_config):
         # storage stats worker config
     launch_config = dict(
@@ -934,6 +970,7 @@ def create_dup_producer_config(jar_version, time,
          LaunchConfigurationName=get_name(launch_config),
          MinSize=0,
          MaxSize=1,
+         AvailabilityZones=availability_zones,
          VPCZoneIdentifier=subnet_ids)
     scale_up_policy =  None
     scale_up_alarm = None
@@ -967,7 +1004,8 @@ def create_dup_producer_config(jar_version, time,
                                 scale_down_policy,
                                 scale_down_alarm)
 
-def create_sentinel_config(jar_version, time, subnet_ids, base_launch_config):
+def create_sentinel_config(jar_version, time, subnet_ids,
+                           availability_zones, base_launch_config):
 
     # sentinel config
     launch_config = dict(
@@ -981,6 +1019,7 @@ def create_sentinel_config(jar_version, time, subnet_ids, base_launch_config):
          LaunchConfigurationName=get_name(launch_config),
          MinSize=1,
          MaxSize=1,
+         AvailabilityZones=availability_zones,
          VPCZoneIdentifier=subnet_ids)
 
     return AutoScaleGroupConfig(asg,
