@@ -86,7 +86,7 @@ def cli(aws_profile, config_dir):
 
     #latest trusty
     # ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727 
-    image_id = 'ami-3408c34c'
+    image_id = 'ami-c29e1cb8'
 
     sns_client = session.client('sns')
     ec2_client = session.client('ec2')
