@@ -250,7 +250,7 @@ def get_subnets(ec2_client):
         if subnet["VpcId"] == vpcId:
             vpc_subnets.append(subnet)
 
-    return subnets
+    return vpc_subnets
 
 def get_subnet_availability_zones(ec2_client):
     av_zones = []
