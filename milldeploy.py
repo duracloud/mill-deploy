@@ -84,9 +84,7 @@ def cli(aws_profile, config_dir):
     jar_version = props["jarVersion"]
     key_name = props["keyName"]
 
-    #latest trusty
-    # ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727 
-    image_id = 'ami-c29e1cb8'
+    image_id = props["amiId"]
 
     sns_client = session.client('sns')
     ec2_client = session.client('ec2')
