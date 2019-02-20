@@ -164,13 +164,6 @@ def cli(aws_profile, config_dir):
                                                      env_prefix,
                                                      base_launch_config))
 
-    groups.append(create_dup_producer_config(jar_version,
-                                                     time,
-                                                     subnet_ids,
-                                                     availability_zones,
-                                                     env_prefix,
-                                                     base_launch_config))
-
     # create autoscale and cloudwatch clients
     autoscale_client = session.client('autoscaling')
     cloudwatch_client = session.client('cloudwatch')
@@ -937,62 +930,6 @@ def create_bit_report_worker_config(jar_version, time,
         Threshold=0,
         EvaluationPeriods=6,
         ComparisonOperator='LessThanOrEqualToThreshold'
-    )
-
-    return AutoScaleGroupConfig(asg,
-                                launch_config,
-                                scale_up_policy,
-                                scale_up_alarm,
-                                scale_down_policy,
-                                scale_down_alarm)
-
-def create_dup_producer_config(jar_version, time,
-                                       subnet_ids,
-                                       availability_zones,
-                                       env_prefix, base_launch_config):
-        # storage stats worker config
-    launch_config = dict(
-        LaunchConfigurationName=("dup producer %s %s" % (
-            jar_version,
-                                                            time)),
-        InstanceType="t2.micro",
-        UserData=read_file_as_string(
-            'output/cloud-init-dup-producer.txt')
-    )
-
-    launch_config.update(base_launch_config)
-
-    scaling_group_name = 'Dup Producer'
-    asg = dict(
-         AutoScalingGroupName=scaling_group_name,
-         LaunchConfigurationName=get_name(launch_config),
-         MinSize=0,
-         MaxSize=1,
-         AvailabilityZones=availability_zones,
-         VPCZoneIdentifier=subnet_ids)
-    scale_up_policy =  None
-    scale_up_alarm = None
-
-    scale_down_policy =  dict(AutoScalingGroupName=scaling_group_name,
-        PolicyName='Scale Down',
-        PolicyType='SimpleScaling',
-        Cooldown=600,
-        ScalingAdjustment=-1,
-        AdjustmentType='ChangeInCapacity')
-
-
-    scale_down_alarm = dict(
-        AlarmName='prod-dup-producer-complete',
-        AlarmDescription='dup producer complete',
-        ActionsEnabled=True,
-        AlarmActions=[],
-        MetricName='DupProducerComplete',
-        Namespace='AWS/SQS',
-        Statistic='Average',
-        Period=300,
-        Threshold=1,
-        EvaluationPeriods=1,
-        ComparisonOperator='GreaterThanOrEqualToThreshold'
     )
 
     return AutoScaleGroupConfig(asg,
