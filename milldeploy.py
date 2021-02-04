@@ -394,7 +394,7 @@ def create_storage_stats_worker_config(jar_version, time,
         LaunchConfigurationName=("storage stats worker %s %s" % (jar_version,
                                                             time)),
         InstanceType="m4.large",
-        SpotPrice="0.05",
+        SpotPrice="0.08",
         UserData=read_file_as_string('output/cloud-init-storage-stats-worker.txt'))
     launch_config.update(base_launch_config)
 
@@ -476,7 +476,7 @@ def create_audit_worker_config(jar_version, time,
         LaunchConfigurationName=("audit worker %s %s" % (jar_version,
                                                             time)),
         InstanceType="m4.large",
-        SpotPrice="0.04",
+        SpotPrice="0.08",
         UserData=read_file_as_string('output/cloud-init-audit-worker.txt'),
         BlockDeviceMappings=[
         {
@@ -569,7 +569,7 @@ def create_high_priority_dup_worker_config(jar_version, time,
             jar_version,
                                                             time)),
         InstanceType="m4.large",
-        SpotPrice="0.04",
+        SpotPrice="0.08",
         UserData=read_file_as_string(
             'output/cloud-init-dup-worker.txt'),
         BlockDeviceMappings=[
@@ -665,7 +665,7 @@ def create_low_priority_dup_worker_config(jar_version, time,
             jar_version,
                                                             time)),
         InstanceType="m4.large",
-        SpotPrice="0.04",
+        SpotPrice="0.08",
         UserData=read_file_as_string(
             'output/cloud-init-dup-worker.txt'),
         BlockDeviceMappings=[
@@ -760,7 +760,7 @@ def create_bit_worker_config(jar_version, time,
             jar_version,
                                                             time)),
         InstanceType="m4.large",
-        SpotPrice="0.04",
+        SpotPrice="0.08",
         UserData=read_file_as_string(
             'output/cloud-init-bit-worker.txt'),
         BlockDeviceMappings=[
@@ -855,7 +855,7 @@ def create_bit_report_worker_config(jar_version, time,
             jar_version,
                                                             time)),
         InstanceType="m4.large",
-        SpotPrice="0.04",
+        SpotPrice="0.08",
         UserData=read_file_as_string(
             'output/cloud-init-bit-report-worker.txt'),
         BlockDeviceMappings=[
