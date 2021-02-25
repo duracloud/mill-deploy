@@ -945,7 +945,7 @@ def create_sentinel_config(jar_version, time, subnet_ids,
     # sentinel config
     launch_config = dict(
         LaunchConfigurationName=("sentinel %s %s" % (jar_version, time)),
-        InstanceType="t2.medium",
+        InstanceType="t3.medium",
         UserData=read_file_as_string('output/cloud-init-sentinel.txt'))
     launch_config.update(base_launch_config)
 
